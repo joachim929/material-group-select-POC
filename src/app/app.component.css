@@ -1,0 +1,34 @@
+.group-checkbox:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.group-checkbox {
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+.group-checkbox .mat-checkbox-layout {
+  flex: 1;
+  line-height: 3em;
+  height: 3em;
+  align-items: center;
+}
+
+.mat-checkbox-layout .mat-checkbox-label {
+  flex: 1;
+  font-weight: bold;
+}
+
+.mat-select-panel {
+  max-height: 512px !important;
+}
+
+.mat-group-multi-select {
+  display: flex;
+  justify-content: center;
+}
+
+button.hidden {
+  visibility: hidden;
+}
