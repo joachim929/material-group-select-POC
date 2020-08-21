@@ -53,6 +53,7 @@ export class AppComponent implements OnInit {
   groupControl = new FormGroup({});
   intermediate: any = {};
   selectControl = new FormControl();
+  alignment = new FormControl();
 
   filteredOptions$: Observable<PokemonGroup[]>;
 

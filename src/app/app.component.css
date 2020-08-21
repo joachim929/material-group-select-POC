@@ -25,10 +25,13 @@
 }
 
 .mat-group-multi-select {
-  height: 100%;
-  align-items: center;
+  flex: 1;
   display: flex;
   justify-content: center;
+}
+
+.mat-group-multi-select.align-center {
+  align-items: center;
 }
 
 button.hidden {
@@ -41,4 +44,15 @@ button.hidden {
 
 .pokemon-option {
   padding-left: 32px;
+}
+
+.alignment-checkbox {
+  margin: 16px;
+  flex: 0;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }

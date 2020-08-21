@@ -1,4 +1,5 @@
-<div class="mat-group-multi-select">
+<mat-checkbox class="alignment-checkbox" [formControl]="alignment">Align center</mat-checkbox>
+<div class="mat-group-multi-select" [class.align-center]="alignment.value">
   <mat-form-field>
     <mat-label>Pokemon example</mat-label>
     <mat-select [formControl]="selectControl"
