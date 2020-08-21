@@ -16,7 +16,6 @@
         </button>
       </mat-form-field>
       <ng-container *ngFor="let group of filteredOptions$ | async" [formGroup]="groupControl">
-        <pre>{{intermediate[group.id]}} {{groupControl.get(group.id).value | json}}</pre>
         <mat-checkbox [formControlName]="group.id" matRipple
                       color="primary" class="group-checkbox"
                       [indeterminate]="intermediate[group.id]"

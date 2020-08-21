@@ -34,7 +34,6 @@ export class AppComponent implements OnInit {
     {
       id: 'fire',
       name: 'Fire',
-      disabled: true,
       pokemon: [
         {parentId: 'fire', value: 'charmander-6', viewValue: 'Charmander'},
         {parentId: 'fire', value: 'vulpix-7', viewValue: 'Vulpix'},
