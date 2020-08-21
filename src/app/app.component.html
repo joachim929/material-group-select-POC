@@ -3,11 +3,11 @@
     <mat-label>Pokemon example</mat-label>
     <mat-select [formControl]="selectControl"
                 (openedChange)="searchControl.reset()" multiple>
-      <mat-form-field style="width: 100%;">
+      <mat-form-field class="multi-select-search-container">
         <button mat-button matPrefix mat-icon-button>
           <mat-icon>search</mat-icon>
         </button>
-        <input matInput type="text" [formControl]="searchControl" autocomplete="false"
+        <input matInput type="text" [formControl]="searchControl" autocomplete="off"
                (keydown.control.a)="$event.stopPropagation()"
                placeholder="Search value"
                (keydown.space)="$event.stopPropagation()">
@@ -15,8 +15,8 @@
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
-
-      <ng-container *ngFor="let group of filteredOptions" [formGroup]="groupControl">
+      <ng-container *ngFor="let group of filteredOptions$ | async" [formGroup]="groupControl">
+        <pre>{{intermediate[group.id]}} {{groupControl.get(group.id).value | json}}</pre>
         <mat-checkbox [formControlName]="group.id" matRipple
                       color="primary" class="group-checkbox"
                       [indeterminate]="intermediate[group.id]"
@@ -24,8 +24,7 @@
           {{group.name}}
         </mat-checkbox>
 
-        <mat-option *ngFor="let pokemon of group.pokemon"
-                    style="padding-left: 32px;"
+        <mat-option *ngFor="let pokemon of group.pokemon" class="pokemon-option"
                     [value]="pokemon">{{pokemon.viewValue}}</mat-option>
       </ng-container>
     </mat-select>

@@ -1,19 +1,9 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
-import {filter} from 'rxjs/operators';
-
-interface Pokemon {
-  parentId: string
-  value: string;
-  viewValue: string;
-}
-
-interface PokemonGroup {
-  id: string,
-  disabled?: boolean;
-  name: string;
-  pokemon: Pokemon[];
-}
+import {filter, map, startWith} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {PokemonGroup} from './interaces/pokemon-group.interface';
+import {Pokemon} from './interaces/pokemon.interface';
 
 @Component({
   selector: 'app-root',
@@ -22,10 +12,6 @@ interface PokemonGroup {
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
-  searchControl = new FormControl('');
-  groupControl = new FormGroup({});
-  intermediate: any = {};
-  selectControl = new FormControl();
   pokemonGroups: PokemonGroup[] = [
     {
       id: 'grass',
@@ -64,46 +50,61 @@ export class AppComponent implements OnInit {
       ]
     }
   ];
+  searchControl = new FormControl('');
+  groupControl = new FormGroup({});
+  intermediate: any = {};
+  selectControl = new FormControl();
 
-  filteredOptions: any[];
+  filteredOptions$: Observable<PokemonGroup[]>;
 
   ngOnInit() {
-    this.pokemonGroups.map((group) => {
+    this.pokemonGroups.forEach((group) => {
       this.groupControl.addControl(group.id, new FormControl());
       this.intermediate[group.id] = false;
     });
 
-    this.filteredOptions = [...this.pokemonGroups];
+    this.filteredOptions$ = this.searchControl.valueChanges.pipe(
+      map((query: string) => !!query ? this.pokemonGroups
+          .map((group) => ({
+            ...group,
+            pokemon: group.pokemon.filter((pokemon) => pokemon.viewValue.toLowerCase().indexOf(query.toLowerCase()) !== -1)
+          }))
+          .filter((group) => group.pokemon.length > 0) :
+        [...this.pokemonGroups]
+      ),
+      startWith([...this.pokemonGroups])
+    );
 
-    this.searchControl.valueChanges.subscribe((nextValue) => {
-      if (!!nextValue) {
-        this.filteredOptions = [...this.pokemonGroups].map((group) => ({
-          ...group,
-          pokemon: group.pokemon.filter((pokemon) =>
-            pokemon.viewValue.toLowerCase().indexOf(nextValue.toLowerCase()) !== -1)
-        }));
-        this.filteredOptions = [...this.filteredOptions].filter(group => group.pokemon.length > 0);
-      } else {
-        this.filteredOptions = [...this.pokemonGroups];
-      }
-    });
-
-    this.selectControl.valueChanges.subscribe(nextSelection => {
-      if (!!nextSelection) {
-        this.pokemonGroups.map((group) => {
+    this.selectControl.valueChanges.pipe(
+      map((nextSelection) => nextSelection.reduce((acc, pokemon) => {
+        acc[pokemon.parentId] = acc[pokemon.parentId] ? [...acc[pokemon.parentId], pokemon] : [pokemon];
+        return acc;
+      }, {})),
+      filter((sortedSelection) => !!sortedSelection)
+    ).subscribe((sortedSelection: { [key: string]: Pokemon[] }) => {
+      this.pokemonGroups.forEach((group) => {
+        if (typeof sortedSelection[group.id] !== 'undefined') {
+          this.intermediate[group.id] = sortedSelection[group.id]?.length !== group.pokemon.length;
+          if (sortedSelection[group.id]?.length === group.pokemon.length) {
+            this.groupControl.get(group.id).setValue(true, {emitEvent: false});
+          }
+        } else {
           this.intermediate[group.id] = false;
-        });
-        nextSelection.map((pokemon) => {
-          this.intermediate[pokemon.parentId] = true;
-        });
-      }
+          this.groupControl.get(group.id).setValue(false, {emitEvent: false});
+        }
+      });
     });
 
-    this.groupControl.valueChanges.pipe(
-      filter(() => !!this.selectControl.value)
-    ).subscribe(nextSelection => {
-      this.selectControl.setValue(this.selectControl.value.filter((pokemon) =>
-        nextSelection[pokemon.parentId]));
+
+    this.groupControl.valueChanges.subscribe(nextSelection => {
+      const test: Pokemon[] = [].concat(...this.pokemonGroups
+        .filter((group) => !!nextSelection[group.id])
+        .map((group, index) => {
+          this.intermediate[group.id] = false;
+          return group.pokemon;
+        })
+      );
+      this.selectControl.setValue(test, {emitEvent: false});
     });
   }
 }

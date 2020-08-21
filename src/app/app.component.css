@@ -25,10 +25,20 @@
 }
 
 .mat-group-multi-select {
+  height: 100%;
+  align-items: center;
   display: flex;
   justify-content: center;
 }
 
 button.hidden {
   visibility: hidden;
+}
+
+.multi-select-search-container {
+  width: 100%;
+}
+
+.pokemon-option {
+  padding-left: 32px;
 }
