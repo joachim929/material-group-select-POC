@@ -94,15 +94,17 @@ export class AppComponent implements OnInit {
       });
     });
 
-
     this.groupControl.valueChanges.subscribe(nextSelection => {
-      const test: Pokemon[] = [].concat(...this.pokemonGroups
+      const test: Pokemon[] = this.pokemonGroups
         .filter((group) => !!nextSelection[group.id])
         .map((group, index) => {
           this.intermediate[group.id] = false;
           return group.pokemon;
         })
-      );
+        .reduce((acc, pokemonArray) => {
+          acc = [...acc, ...pokemonArray];
+          return acc;
+        }, []);
       this.selectControl.setValue(test, {emitEvent: false});
     });
   }
